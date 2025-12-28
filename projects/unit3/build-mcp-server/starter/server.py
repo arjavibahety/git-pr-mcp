@@ -34,12 +34,13 @@ TEMPLATES_DIR = Path(__file__).parent.parent.parent / "templates"
 # TODO: Replace these with your actual implementations
 
 @mcp.tool()
-async def analyze_file_changes(base_branch: str = "main", include_diff: bool = True) -> str:
+async def analyze_file_changes(base_branch: str = "main", include_diff: bool = True, max_diff_lines: int = 500) -> str:
     """Get the full diff and list of changed files in the current git repository.
     
     Args:
         base_branch: Base branch to compare against (default: main)
         include_diff: Include the full diff content (default: true)
+        max_diff_lines: Manimum diff lines to include (default: 500)
     """
     # TODO: Implement this tool
     # IMPORTANT: MCP tools have a 25,000 token response limit!
@@ -54,6 +55,12 @@ async def analyze_file_changes(base_branch: str = "main", include_diff: bool = T
     # roots_result = await context.session.list_roots()
     # working_dir = roots_result.roots[0].uri.path
     # subprocess.run(["git", "diff"], cwd=working_dir)
+
+    result = subprocess.run(
+        ["git", "diff", f"{base_branch}...HEAD"],
+        capture_output=True,
+        text=True
+    )
     
     return json.dumps({"error": "Not implemented yet", "hint": "Use subprocess to run git commands"})
 
