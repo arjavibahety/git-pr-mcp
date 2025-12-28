@@ -8,6 +8,7 @@ import json
 from re import sub
 import subprocess
 import logging
+import os
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
@@ -24,23 +25,6 @@ logger = logging.getLogger(__name__)
 
 # PR template directory (shared across all modules)
 TEMPLATES_DIR = Path(__file__).parent.parent.parent / "templates"
-
-
-# TODO: Implement tool functions here
-# Example structure for a tool:
-# @mcp.tool()
-# async def analyze_file_changes(base_branch: str = "main", include_diff: bool = True) -> str:
-#     """Get the full diff and list of changed files in the current git repository.
-#     
-#     Args:
-#         base_branch: Base branch to compare against (default: main)
-#         include_diff: Include the full diff content (default: true)
-#     """
-#     # Your implementation here
-#     pass
-
-# Minimal stub implementations so the server runs
-# TODO: Replace these with your actual implementations
 
 @mcp.tool()
 async def analyze_file_changes(base_branch: str = "main", include_diff: bool = True, max_diff_lines: int = 500) -> str:
@@ -73,7 +57,7 @@ async def analyze_file_changes(base_branch: str = "main", include_diff: bool = T
             working_dir = roots_result.roots[0].uri.path
         except Exception as e:
             logger.warning(f'Unable to use MCP context: {e}')
-            working_dir = None
+            working_dir = os.getcwd()
 
         files_result = subprocess.run(
             ["git", "diff", "--name-status", f"{base_branch}...HEAD"],
@@ -104,11 +88,12 @@ async def analyze_file_changes(base_branch: str = "main", include_diff: bool = T
         )
         
         return json.dumps({
+            "base_branch": base_branch,
             "stats": stats_result.stdout,
-            "total_lines": len(diff_lines),
+            "total_diff_lines": len(diff_lines),
             "files_changed": files_result.stdout,
             "diff": diff_output if include_diff else "Use include_diff=true to see diff"
-        })
+        }, indent=2)
     except Exception as e:
         return json.dumps({"error": str(e)})
 
