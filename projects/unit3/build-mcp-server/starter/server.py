@@ -13,7 +13,7 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-# Initialize the FastMCP server
+# Initialize the FastMCP server and let's see
 mcp = FastMCP("pr-agent")
 
 logging.basicConfig(
@@ -35,19 +35,6 @@ async def analyze_file_changes(base_branch: str = "main", include_diff: bool = T
         include_diff: Include the full diff content (default: true)
         max_diff_lines: Manimum diff lines to include (default: 500)
     """
-    # TODO: Implement this tool
-    # IMPORTANT: MCP tools have a 25,000 token response limit!
-    # Large diffs can easily exceed this. Consider:
-    # - Adding a max_diff_lines parameter (e.g., 500 lines)
-    # - Truncating large outputs with a message
-    # - Returning summary statistics alongside limited diffs
-    
-    # NOTE: Git commands run in the server's directory by default!
-    # To run in Claude's working directory, use MCP roots:
-    # context = mcp.get_context()
-    # roots_result = await context.session.list_roots()
-    # working_dir = roots_result.roots[0].uri.path
-    # subprocess.run(["git", "diff"], cwd=working_dir)
 
     try:
         working_dir = None
@@ -148,6 +135,7 @@ async def suggest_template(changes_summary: str, change_type: str) -> str:
         change_type: The type of change you've identified (bug, feature, docs, refactor, test, etc.)
     """
     
+
     try:
         change_type_lower = change_type.lower()
         template_filename = change_type_lower + ".md"
