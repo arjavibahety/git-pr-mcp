@@ -58,6 +58,7 @@ async def analyze_file_changes(base_branch: str = "main", include_diff: bool = T
 
     result = subprocess.run(
         ["git", "diff", f"{base_branch}...HEAD"],
+        
         capture_output=True,
         text=True
     )
