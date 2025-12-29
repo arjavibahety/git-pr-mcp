@@ -9,6 +9,7 @@ import os
 import subprocess
 from typing import Optional
 from pathlib import Path
+import requests
 
 from mcp.server.fastmcp import FastMCP
 
@@ -251,17 +252,31 @@ async def send_slack_notification(message: str) -> str:
         return "Error: SLACK_WEBHOOK_URL environment variable not set"
     
     try:
-        # TODO: Import requests library
-        # TODO: Send POST request to webhook_url with JSON payload
-        # TODO: Include the message in the JSON data
-        # TODO: Handle the response and return appropriate status
-        
-        # For now, return a placeholder
-        return f"TODO: Implement Slack webhook POST request for message: {message[:50]}..."
-        
+        webhook_url = os.getenv("SLACK_WEBHOOK_URL")
+        if not webhook_url:
+            return "Error: SLACK_WEBHOOK_URL env var is not set"
+
+        payload = {
+            "text": message,
+            "mrkdwn": True
+        }
+
+        response = requests.post(
+            webhook_url,
+            json=payload,
+            timeout=10
+        )
+
+        if response.status_code == 200:
+            return "Message sent successfully"
+        else:
+            return f"Failed to send message. Status: {response.status_code}, Response: {response.text}"
+    except requests.exceptions.Timeout:
+        return "Request timed out. Check internet connection and try again"
+    except requests.exceptions.ConnectionError:
+        return "Connection error. Check your internet connection and webhook url"
     except Exception as e:
         return f"Error sending message: {str(e)}"
-
 
 # ===== New Module 3: Slack Formatting Prompts =====
 

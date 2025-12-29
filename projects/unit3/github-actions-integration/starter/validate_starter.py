@@ -4,6 +4,7 @@ Validation script for Module 1 starter code
 Ensures the starter template is ready for learners to implement
 """
 
+
 import subprocess
 import sys
 import os
